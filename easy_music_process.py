@@ -1,6 +1,8 @@
 import argparse
 import importlib.util
+import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import music2picture
@@ -51,6 +53,21 @@ def ask_settings():
     return source, output, genre or None
 
 
+def publish_processed_tree(staging_path, output_path):
+    output_path.mkdir(parents=True, exist_ok=True)
+    for source_item in staging_path.rglob("*"):
+        relative = source_item.relative_to(staging_path)
+        target_item = output_path / relative
+        if source_item.is_dir():
+            target_item.mkdir(parents=True, exist_ok=True)
+            continue
+
+        target_item.parent.mkdir(parents=True, exist_ok=True)
+        if target_item.exists():
+            target_item.unlink()
+        shutil.move(str(source_item), str(target_item))
+
+
 def process_music(
     source,
     output,
@@ -64,40 +81,48 @@ def process_music(
 ):
     source_path = Path(source).expanduser()
     output_path = Path(output).expanduser()
-    covers_path = output_path / "covers"
+    output_parent = output_path.resolve().parent
+    output_parent.mkdir(parents=True, exist_ok=True)
 
-    print("\nStep 1/3: normalize, gently denoise, and safely boost audio")
-    normalize_music_file.normalize_music(
-        source_path,
-        output_path,
-        final_gain=final_gain,
-        denoise=denoise,
-        denoise_strength=denoise_strength,
-        limiter=limiter,
-    )
+    with tempfile.TemporaryDirectory(prefix="musicpolisher_", dir=output_parent) as temp_dir:
+        staging_path = Path(temp_dir) / "processed"
+        covers_path = staging_path / "covers"
 
-    print("\nStep 2/3: write clean title/genre metadata")
-    music_metadata.require_ffmpeg()
-    music_metadata.update_music_metadata(
-        output_path,
-        genre_override=genre,
-        overwrite_genre=overwrite_genre,
-    )
+        print("\nStep 1/4: normalize, gently denoise, and safely boost audio")
+        normalize_music_file.normalize_music(
+            source_path,
+            staging_path,
+            final_gain=final_gain,
+            denoise=denoise,
+            denoise_strength=denoise_strength,
+            limiter=limiter,
+        )
 
-    print("\nStep 3/3: create and embed covers")
-    music2picture.require_ffmpeg()
-    music2picture.make_covers(
-        output_path,
-        covers_path,
-        size=1000,
-        patterns=2,
-        center_title=True,
-        embed=True,
-        color_mode=color_mode,
-    )
+        print("\nStep 2/4: write clean title/genre metadata")
+        music_metadata.require_ffmpeg()
+        music_metadata.update_music_metadata(
+            staging_path,
+            genre_override=genre,
+            overwrite_genre=overwrite_genre,
+        )
+
+        print("\nStep 3/4: create and embed covers")
+        music2picture.require_ffmpeg()
+        music2picture.make_covers(
+            staging_path,
+            covers_path,
+            size=1000,
+            patterns=2,
+            center_title=True,
+            embed=True,
+            color_mode=color_mode,
+        )
+
+        print("\nStep 4/4: publish processed files to output folder")
+        publish_processed_tree(staging_path, output_path)
 
     print(f"\nDone. Songs are saved in: {output_path.resolve()}")
-    print(f"Covers are saved in: {covers_path.resolve()}")
+    print(f"Covers are saved in: {(output_path / 'covers').resolve()}")
 
 
 def main():
