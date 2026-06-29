@@ -285,11 +285,24 @@ def read_existing_genre(audio_path):
     return ""
 
 
-def write_metadata(audio_path, title, genre, dry_run=False):
+def normalized_extra_metadata(extra_metadata=None):
+    if not extra_metadata:
+        return {}
+    return {
+        str(key).strip(): str(value).strip()
+        for key, value in extra_metadata.items()
+        if str(key).strip() and str(value).strip()
+    }
+
+
+def write_metadata(audio_path, title, genre, dry_run=False, extra_metadata=None):
     audio_path = Path(audio_path)
     temp_path = audio_path.with_name(f"{audio_path.stem}.metadata_tmp{audio_path.suffix}")
+    extra_metadata = normalized_extra_metadata(extra_metadata)
     if dry_run:
-        print(f"Dry run: {audio_path.name} -> title={title!r}, genre={genre!r}, album='', artist=''")
+        extras = ", ".join(f"{key}={value!r}" for key, value in extra_metadata.items())
+        extras_text = f", {extras}" if extras else ""
+        print(f"Dry run: {audio_path.name} -> title={title!r}, genre={genre!r}{extras_text}")
         return
 
     command = [
@@ -309,6 +322,8 @@ def write_metadata(audio_path, title, genre, dry_run=False):
         "-metadata",
         f"genre={genre}",
     ]
+    for key, value in extra_metadata.items():
+        command.extend(["-metadata", f"{key}={value}"])
     if audio_path.suffix.lower() == ".mp3":
         command.extend(["-id3v2_version", "3"])
     command.append(str(temp_path))
@@ -365,7 +380,7 @@ def choose_genre_interactively(audio_path, allowed_genres, suggested_genre):
         return answer
 
 
-def update_music_metadata(source, genres=None, genres_file=None, dry_run=False, manual=False, select=False, genre_override=None, overwrite_genre=False):
+def update_music_metadata(source, genres=None, genres_file=None, dry_run=False, manual=False, select=False, genre_override=None, overwrite_genre=False, extra_metadata=None):
     source_path = Path(source).resolve()
     files = audio_files(source_path)
     allowed_genres = load_genres(genres, genres_file)
@@ -399,8 +414,11 @@ def update_music_metadata(source, genres=None, genres_file=None, dry_run=False, 
                 genre = suggested_genre
             action = "write genre" if not existing_genre else "overwrite genre"
 
-        print(f"[{index}/{len(files)}] Metadata: {audio_path.name} -> title={title!r}, genre={genre!r}, album='', artist='' ({action})")
-        write_metadata(audio_path, title, genre, dry_run=dry_run)
+        extra_metadata = normalized_extra_metadata(extra_metadata)
+        extras = ", ".join(f"{key}={value!r}" for key, value in extra_metadata.items())
+        extras_text = f", {extras}" if extras else ""
+        print(f"[{index}/{len(files)}] Metadata: {audio_path.name} -> title={title!r}, genre={genre!r}{extras_text} ({action})")
+        write_metadata(audio_path, title, genre, dry_run=dry_run, extra_metadata=extra_metadata)
 
     print("Metadata update finished.")
 
@@ -411,6 +429,13 @@ def main():
     parser.add_argument("--genres", help="Comma-separated custom genre list, for example: Pop,Rock,Techno")
     parser.add_argument("--genres-file", help="UTF-8 text file with one allowed genre per line.")
     parser.add_argument("--genre", help="Set this genre manually for all selected songs.")
+    parser.add_argument("--artist", help="Set artist metadata. Empty means no artist is written.")
+    parser.add_argument("--album", help="Set album metadata. Empty means no album is written.")
+    parser.add_argument("--album-artist", help="Set album artist metadata. Empty means no album artist is written.")
+    parser.add_argument("--composer", help="Set composer metadata. Empty means no composer is written.")
+    parser.add_argument("--date", help="Set date/year metadata. Empty means no date is written.")
+    parser.add_argument("--track", help="Set track metadata. Empty means no track number is written.")
+    parser.add_argument("--comment", help="Set comment metadata. Empty means no comment is written.")
     parser.add_argument("--manual", action="store_true", help="Ask which genre to write for each song.")
     parser.add_argument("--select", action="store_true", help="Choose song numbers from the source folder before writing metadata.")
     parser.add_argument("--dry-run", action="store_true", help="Show changes without modifying audio files.")
@@ -427,6 +452,15 @@ def main():
         select=args.select,
         genre_override=args.genre,
         overwrite_genre=args.overwrite_genre,
+        extra_metadata={
+            "artist": args.artist,
+            "album": args.album,
+            "album_artist": args.album_artist,
+            "composer": args.composer,
+            "date": args.date,
+            "track": args.track,
+            "comment": args.comment,
+        },
     )
 
 
