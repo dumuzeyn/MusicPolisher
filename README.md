@@ -1,6 +1,12 @@
 # Кузница Звука
 
-**English version:** [Sonic Forge](#sonic-forge)
+<p align="center">
+  <a href="https://github.com/dumuzeyn/MusicPolisher/blob/main/dist/SonicForge.exe">
+    <img src="https://img.shields.io/badge/Скачать_APK-Кцзница--Звука.apk-black?style=for-the-badge" alt="Скачать APK">
+  </a>
+</p>
+
+[English version](#loleng)
 
 Кузница Звука - настольное приложение для подготовки музыкальных файлов. Оно нормализует громкость, обновляет метаданные, создает обложки и сохраняет готовые файлы в выбранную папку только после успешного завершения всех этапов.
 
@@ -81,9 +87,17 @@ pip install numpy pillow pyinstaller
 
 Для собранного `.exe` FFmpeg устанавливать отдельно не нужно. Он встроен в файл приложения.
 
+>**Автор проекта: Зейналов У.Р.о.**
 ---
+<h1 id = loleng>
+ Sonic Forge
+</h1>
 
-# Sonic Forge
+<p align="center">
+  <a href="https://github.com/dumuzeyn/MusicPolisher/blob/main/dist/SonicForge.exe">
+    <img src="https://img.shields.io/badge/Download_APK-Sonic--Forge.apk-black?style=for-the-badge" alt="Скачать APK">
+  </a>
+</p>
 
 Sonic Forge is a desktop application for preparing music files. It normalizes loudness, updates metadata, generates cover art, and publishes finished files to the selected output folder only after every processing step succeeds.
 
@@ -163,3 +177,5 @@ pip install numpy pillow pyinstaller
 ```
 
 The built `.exe` does not require a separate FFmpeg installation. FFmpeg is bundled into the application file.
+
+>**Author of project: Zeynalov U.R.o.**
