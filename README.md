@@ -1,7 +1,7 @@
 # Кузница Звука
 
 <p align="center">
-  <a href="https://github.com/dumuzeyn/MusicPolisher/blob/main/dist/SonicForge.exe">
+  <a href="https://github.com/dumuzeyn/Sonic-Forge/blob/main/dist/SonicForge.exe">
     <img src="https://img.shields.io/badge/Скачать_APK-Кцзница--Звука.apk-black?style=for-the-badge" alt="Скачать APK">
   </a>
 </p>
@@ -25,7 +25,7 @@
 
 Готовая сборка содержит FFmpeg и FFprobe внутри. Для обычного запуска достаточно скачать один файл:
 
-[Скачать SonicForge.exe](https://github.com/dumuzeyn/MusicPolisher/raw/main/dist/SonicForge.exe)
+[Скачать SonicForge.exe](https://github.com/dumuzeyn/Sonic-Forge/blob/main/dist/SonicForge.exe)
 
 Запуск из PowerShell:
 
@@ -94,7 +94,7 @@ pip install numpy pillow pyinstaller
 </h1>
 
 <p align="center">
-  <a href="https://github.com/dumuzeyn/MusicPolisher/blob/main/dist/SonicForge.exe">
+  <a href="https://github.com/dumuzeyn/Sonic-Forge/blob/main/dist/SonicForge.exe">
     <img src="https://img.shields.io/badge/Download_APK-Sonic--Forge.apk-black?style=for-the-badge" alt="Скачать APK">
   </a>
 </p>
@@ -116,7 +116,7 @@ Sonic Forge is a desktop application for preparing music files. It normalizes lo
 
 The ready build includes FFmpeg and FFprobe. For normal use, downloading one file is enough:
 
-[Download SonicForge.exe](https://github.com/dumuzeyn/MusicPolisher/raw/main/dist/SonicForge.exe)
+[Download SonicForge.exe](https://github.com/dumuzeyn/Sonic-Forge/blob/main/dist/SonicForge.exe)
 
 PowerShell launch:
 
